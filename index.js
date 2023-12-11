@@ -6,6 +6,7 @@ const c = canvas.getContext("2d");
 const scoreEl = document.querySelector("#scoreEl");
 const modalEl = document.querySelector("#modalEl");
 const modalScoreEl = document.querySelector("#modalScoreEl");
+const buttonEl = document.querySelector("#buttonEl");
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -75,13 +76,23 @@ class Enemy {
 const X = canvas.width / 2;
 const Y = canvas.height / 2;
 
-const player = new Player(X, Y, 10, "white");
+let player = new Player(X, Y, 10, "white");
+let projectiles = [];
+let enemies = [];
+let animationId;
+let intervalId;
+let score = 0;
 
-const projectiles = [];
-const enemies = [];
+function init() {
+  player = new Player(X, Y, 10, "white");
+  projectiles = [];
+  enemies = [];
+  animationId;
+  score = 0;
+}
 
 function spawnEnemies() {
-  setInterval(() => {
+  intervalId = setInterval(() => {
     const radius = Math.random() * (30 - 4) + 4;
     let x;
     let y;
@@ -103,8 +114,6 @@ function spawnEnemies() {
   }, 1000);
 }
 
-let animationId;
-let score = 0;
 function animate() {
   animationId = requestAnimationFrame(animate);
   c.fillStyle = "rgba(0, 0,0, 0.1)";
@@ -136,6 +145,7 @@ function animate() {
     if (distance - enemy.radius - player.radius < 1) {
       // end game
       cancelAnimationFrame(animationId);
+      clearInterval(intervalId);
       modalEl.style.display = "block";
       modalScoreEl.innerHTML = score;
     }
@@ -194,6 +204,13 @@ addEventListener("click", (event) => {
       velocity
     )
   );
+});
+
+buttonEl.addEventListener("click", () => {
+  init();
+  animate();
+  spawnEnemies();
+  modalEl.style.display = "none";
 });
 
 animate();
