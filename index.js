@@ -3,6 +3,8 @@ import { gsap } from "./node_modules/gsap/index.js";
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 
+const scoreEl = document.querySelector("#scoreEl");
+
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
@@ -84,7 +86,6 @@ function spawnEnemies() {
     if (Math.random() < 0.5) {
       x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius;
       y = Math.random() * canvas.height;
-      // y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
     } else {
       x = Math.random() * canvas.width;
       y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
@@ -101,7 +102,7 @@ function spawnEnemies() {
 }
 
 let animationId;
-
+let score = 0;
 function animate() {
   animationId = requestAnimationFrame(animate);
   c.fillStyle = "rgba(0, 0,0, 0.1)";
@@ -136,8 +137,11 @@ function animate() {
         projectile.y - enemy.y
       );
       // when projectiles touch enemy
+      // where we shrink enemy
       if (distance - enemy.radius - projectile.radius < 1) {
         if (enemy.radius - 10 > 5) {
+          score += 100;
+          scoreEl.innerHTML = score;
           gsap.to(enemy, {
             radius: enemy.radius - 10,
           });
@@ -145,6 +149,9 @@ function animate() {
             projectiles.splice(projectileIndex, 1);
           }, 0);
         } else {
+          // rmv enemy if they are too small
+          score += 150;
+          scoreEl.innerHTML = score;
           setTimeout(() => {
             enemies.splice(enemyIndex, 1);
             projectiles.splice(projectileIndex, 1);
