@@ -91,6 +91,7 @@ function init() {
   enemies = [];
   animationId;
   score = 0;
+  scoreEl.innerHTML = "0";
 }
 
 function spawnEnemies() {
@@ -149,6 +150,18 @@ function animate() {
       cancelAnimationFrame(animationId);
       clearInterval(intervalId);
       modalEl.style.display = "block";
+      gsap.fromTo(
+        "#modalEl",
+        {
+          scale: 0.8,
+          opacity: 0,
+        },
+        {
+          scale: 1,
+          opacity: 1,
+          ease: "expo.out",
+        }
+      );
       modalScoreEl.innerHTML = score;
     }
 
@@ -208,16 +221,33 @@ addEventListener("click", (event) => {
   );
 });
 
+// restart
 buttonEl.addEventListener("click", () => {
   init();
   animate();
   spawnEnemies();
-  modalEl.style.display = "none";
-  scoreEl.innerHTML = "0";
+
+  gsap.to("#modalEl", {
+    opacity: 0,
+    scale: 0.8,
+    duration: 0.3,
+    ease: "expo.in",
+    onComplete: () => {
+      modalEl.style.display = "none";
+    },
+  });
 });
 
 startButtonEl.addEventListener("click", () => {
   animate();
   spawnEnemies();
-  startModalEl.style.display = "none";
+  gsap.to("#startModalEl", {
+    opacity: 0,
+    scale: 0.8,
+    duration: 0.3,
+    ease: "expo.in",
+    onComplete: () => {
+      startModalEl.style.display = "none";
+    },
+  });
 });
