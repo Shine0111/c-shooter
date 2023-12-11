@@ -8,8 +8,8 @@ const buttonEl = document.querySelector("#buttonEl");
 const startButtonEl = document.querySelector("#startButtonEl");
 const startModalEl = document.querySelector("#startModalEl");
 
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 class Player {
   constructor(x, y, radius, color) {
@@ -17,6 +17,10 @@ class Player {
     this.y = y;
     this.radius = radius;
     this.color = color;
+    this.velocity = {
+      x: 0,
+      y: 0,
+    };
   }
 
   draw() {
@@ -24,6 +28,34 @@ class Player {
     c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     c.fillStyle = this.color;
     c.fill();
+  }
+
+  update() {
+    this.draw();
+
+    const friction = 0.99;
+
+    this.velocity.x *= friction;
+    this.velocity.y *= friction;
+
+    // collision detection for x axis
+    if (
+      this.x + this.radius + this.velocity.x <= canvas.width &&
+      this.x - this.radius + this.velocity.x >= 0
+    ) {
+      this.x += this.velocity.x;
+    } else {
+      this.velocity.x = 0;
+    }
+    // collision detection for y axis
+    if (
+      this.y + this.radius + this.velocity.y <= canvas.height &&
+      this.y - this.radius + this.velocity.y >= 0
+    ) {
+      this.y += this.velocity.y;
+    } else {
+      this.velocity.y = 0;
+    }
   }
 }
 
@@ -119,7 +151,7 @@ function animate() {
   animationId = requestAnimationFrame(animate);
   c.fillStyle = "rgba(0, 0,0, 0.1)";
   c.fillRect(0, 0, canvas.width, canvas.height);
-  player.draw();
+  player.update();
 
   for (let index = projectiles.length - 1; index >= 0; index--) {
     const projectile = projectiles[index];
@@ -199,18 +231,15 @@ function animate() {
 }
 
 addEventListener("click", (event) => {
-  const angle = Math.atan2(
-    event.clientY - canvas.height / 2,
-    event.clientX - canvas.width / 2
-  );
+  const angle = Math.atan2(event.clientY - player.y, event.clientX - player.x);
   const velocity = {
     x: Math.cos(angle) * 5,
     y: Math.sin(angle) * 5,
   };
   projectiles.push(
     new Projectile(
-      canvas.width / 2,
-      canvas.height / 2,
+      player.x,
+      player.y,
       5,
       "white",
 
@@ -248,4 +277,21 @@ startButtonEl.addEventListener("click", () => {
       startModalEl.style.display = "none";
     },
   });
+});
+
+window.addEventListener("keydown", (event) => {
+  switch (event.key) {
+    case "ArrowRight":
+      player.velocity.x += 1;
+      break;
+    case "ArrowUp":
+      player.velocity.y -= 1;
+      break;
+    case "ArrowLeft":
+      player.velocity.x -= 1;
+      break;
+    case "ArrowDown":
+      player.velocity.y += 1;
+      break;
+  }
 });
