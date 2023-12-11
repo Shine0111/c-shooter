@@ -108,7 +108,10 @@ function animate() {
   c.fillStyle = "rgba(0, 0,0, 0.1)";
   c.fillRect(0, 0, canvas.width, canvas.height);
   player.draw();
-  projectiles.forEach((projectile, index) => {
+
+  for (let index = projectiles.length - 1; index >= 0; index--) {
+    const projectile = projectiles[index];
+
     projectile.update();
     if (
       projectile.x + projectile.radius < 0 ||
@@ -117,12 +120,14 @@ function animate() {
       projectile.y - projectile.radius > canvas.width
     ) {
       // rmv from edges of the canvas
-      setTimeout(() => {
-        projectiles.splice(index, 1);
-      }, 0);
+
+      projectiles.splice(index, 1);
     }
-  });
-  enemies.forEach((enemy, enemyIndex) => {
+  }
+
+  for (let index = enemies.length - 1; index >= 0; index--) {
+    const enemy = enemies[index];
+
     enemy.update();
 
     const distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
@@ -131,7 +136,13 @@ function animate() {
       cancelAnimationFrame(animationId);
     }
 
-    projectiles.forEach((projectile, projectileIndex) => {
+    for (
+      let projectileIndex = projectiles.length - 1;
+      projectileIndex >= 0;
+      projectileIndex--
+    ) {
+      const projectile = projectiles[projectileIndex];
+
       const distance = Math.hypot(
         projectile.x - enemy.x,
         projectile.y - enemy.y
@@ -145,21 +156,19 @@ function animate() {
           gsap.to(enemy, {
             radius: enemy.radius - 10,
           });
-          setTimeout(() => {
-            projectiles.splice(projectileIndex, 1);
-          }, 0);
+
+          projectiles.splice(projectileIndex, 1);
         } else {
           // rmv enemy if they are too small
           score += 150;
           scoreEl.innerHTML = score;
-          setTimeout(() => {
-            enemies.splice(enemyIndex, 1);
-            projectiles.splice(projectileIndex, 1);
-          }, 0);
+
+          enemies.splice(index, 1);
+          projectiles.splice(projectileIndex, 1);
         }
       }
-    });
-  });
+    }
+  }
 }
 
 addEventListener("click", (event) => {
